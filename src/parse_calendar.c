@@ -37,8 +37,8 @@ int convert_calendar_to_json(const char *input_path, const char *output_path) {
   }
 
   char line[512];
-  int first_month = 1;
-  int first_gira = 1;
+  int month_started = 0;
+  int giras_started = 0;
 
   fprintf(out, "{\n  \"calendar\": [\n");
 
@@ -49,42 +49,45 @@ int convert_calendar_to_json(const char *input_path, const char *output_path) {
       continue;
 
     char *colon = strchr(trimmed, ':');
-    if (!colon) {
-      // It's a month name
-      if (!first_month) {
-        fprintf(out, "\n      ]\n    },\n");
+    
+    // Check if it's a new month (starts with emoji OR is a line without colon after giras have started)
+    if (strstr(trimmed, "🔸") || (!colon && (!month_started || giras_started))) {
+      if (month_started) {
+        if (giras_started) {
+          fprintf(out, "\n      ]\n");
+        }
+        fprintf(out, "    },\n");
       }
-      fprintf(out, "    {\n      \"mes\": \"%s\",\n      \"giras\": [", trimmed);
-      first_month = 0;
-      first_gira = 1;
+      fprintf(out, "    {\n      \"mes\": \"%s\"", trimmed);
+      month_started = 1;
+      giras_started = 0;
+    } else if (!colon) {
+      // It's a theme line (no colon and we are already inside a month but haven't started giras)
+      fprintf(out, ",\n      \"tema\": \"%s\"", trimmed);
     } else {
       // It's a gira (type: date)
+      if (!giras_started) {
+        fprintf(out, ",\n      \"giras\": [");
+        giras_started = 1;
+      } else {
+        fprintf(out, ",");
+      }
+      
       *colon = '\0';
       char *type = trim_whitespace(trimmed);
       char *date = trim_whitespace(colon + 1);
 
-      // Filter: ignore 'fechada' and 'desenvolvimento'
-      char *type_lower = strdup(type);
-      for (int i = 0; type_lower[i]; i++) {
-        type_lower[i] = tolower((unsigned char)type_lower[i]);
-      }
-
-      if (strstr(type_lower, "fechada") || strstr(type_lower, "desenvolvimento")) {
-        free(type_lower);
-        continue;
-      }
-      free(type_lower);
-
-      if (!first_gira) {
-        fprintf(out, ",");
-      }
       fprintf(out, "\n        { \"tipo\": \"%s\", \"data\": \"%s\" }", type, date);
-      first_gira = 0;
     }
   }
 
-  if (!first_month) {
-    fprintf(out, "\n      ]\n    }\n");
+  if (month_started) {
+    if (giras_started) {
+      fprintf(out, "\n      ]\n");
+    } else {
+      fprintf(out, ",\n      \"giras\": []\n");
+    }
+    fprintf(out, "    }\n");
   }
 
   fprintf(out, "  ]\n}\n");
