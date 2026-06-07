@@ -17,5 +17,7 @@ typedef struct {
 } CardConfig;
 
 int generate_card(CardConfig *config);
+void init_card_engine(void);
+void cleanup_card_engine(void);
 
 #endif // CARD_H

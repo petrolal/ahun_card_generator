@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(AhunCardGenerator C)
 
-set(CMAKE_C_STANDARD)
+set(CMAKE_C_STANDARD 99)
+add_compile_options(-Wall -Wextra -Wno-unused-parameter)
 
 find_package(PkgConfig REQUIRED)
 
@@ -28,12 +29,12 @@ add_executable(ahun_card_generator ${SOURCES})
 target_link_libraries(ahun_card_generator
   ${MAGICWAND_LIBRARIES}
   ${LIBXML2_LIBRARIES}
-  ${cjson_LIBRARIES}
+  ${CJSON_LIBRARIES}
 )
 
 target_include_directories(ahun_card_generator PRIVATE
   ${MAGICWAND_INCLUDE_DIRS}
   ${LIBXML2_INCLUDE_DIRS}
-  ${cjson_INCLUDE_DIRS}
+  ${CJSON_INCLUDE_DIRS}
   include
 )

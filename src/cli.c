@@ -37,8 +37,15 @@ void show_help(const char *prog_name) {
   printf("\n");
 }
 
+void free_cli_options(CliOptions *opts) {
+  if (opts->template_path) free(opts->template_path);
+  if (opts->output_path) free(opts->output_path);
+  if (opts->text) free(opts->text);
+  if (opts->generate_calendar) free(opts->generate_calendar);
+}
+
 CliOptions parse_arguments(int argc, char *argv[]) {
-  CliOptions opts = {NULL, "output.png", NULL, false, NULL, false, false, 0};
+  CliOptions opts = {NULL, strdup("output.png"), NULL, false, NULL, false, false, 0};
   int opt;
 
   static struct option long_options[] = {
@@ -58,16 +65,20 @@ CliOptions parse_arguments(int argc, char *argv[]) {
       opts.list_templates = true;
       break;
     case 't':
-      opts.template_path = optarg;
+      if (opts.template_path) free(opts.template_path);
+      opts.template_path = strdup(optarg);
       break;
     case 'g':
-      opts.generate_calendar = optarg;
+      if (opts.generate_calendar) free(opts.generate_calendar);
+      opts.generate_calendar = strdup(optarg);
       break;
     case 'o':
-      opts.output_path = optarg;
+      if (opts.output_path) free(opts.output_path);
+      opts.output_path = strdup(optarg);
       break;
     case 'x':
-      opts.text = optarg;
+      if (opts.text) free(opts.text);
+      opts.text = strdup(optarg);
       break;
     case 'i':
       opts.interactive = true;
@@ -98,7 +109,7 @@ void interactive_menu(CliOptions *opts) {
   printf("\n" COLOR_BOLD "Option: " COLOR_RESET);
 
   int choice = 1;
-  char buffer[256];
+  char buffer[512];
   if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
     choice = atoi(buffer);
   }
@@ -107,15 +118,18 @@ void interactive_menu(CliOptions *opts) {
     printf(COLOR_BOLD "Enter calendar text file path: " COLOR_RESET);
     if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
       buffer[strcspn(buffer, "\n")] = 0;
+      if (opts->generate_calendar) free(opts->generate_calendar);
       opts->generate_calendar = strdup(buffer);
     }
     printf(COLOR_BOLD "Enter output JSON path (default: calendar.json): " COLOR_RESET);
     if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
       buffer[strcspn(buffer, "\n")] = 0;
       if (strlen(buffer) > 0) {
+        if (opts->output_path) free(opts->output_path);
         opts->output_path = strdup(buffer);
       } else {
-        opts->output_path = "calendar.json";
+        if (opts->output_path) free(opts->output_path);
+        opts->output_path = strdup("calendar.json");
       }
     }
     printf("\n" COLOR_GREEN "Configuration complete!" COLOR_RESET "\n");
@@ -128,14 +142,16 @@ void interactive_menu(CliOptions *opts) {
   printf("\n" COLOR_BOLD "Enter template name (from above): " COLOR_RESET);
   if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
     buffer[strcspn(buffer, "\n")] = 0;
-    char full_path[512];
+    char full_path[1024];
     snprintf(full_path, sizeof(full_path), "./templates/%s", buffer);
+    if (opts->template_path) free(opts->template_path);
     opts->template_path = strdup(full_path);
   }
 
   printf(COLOR_BOLD "Enter text for the card: " COLOR_RESET);
   if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
     buffer[strcspn(buffer, "\n")] = 0;
+    if (opts->text) free(opts->text);
     opts->text = strdup(buffer);
   }
 
@@ -143,10 +159,10 @@ void interactive_menu(CliOptions *opts) {
   if (fgets(buffer, sizeof(buffer), stdin) != NULL) {
     buffer[strcspn(buffer, "\n")] = 0;
     if (strlen(buffer) > 0) {
+      if (opts->output_path) free(opts->output_path);
       opts->output_path = strdup(buffer);
     }
   }
 
   printf("\n" COLOR_GREEN "Configuration complete!" COLOR_RESET "\n");
 }
-

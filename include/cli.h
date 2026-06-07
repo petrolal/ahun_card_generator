@@ -18,5 +18,6 @@ CliOptions parse_arguments(int argc, char *argv[]);
 void print_banner(void);
 void show_help(const char *prog_name);
 void interactive_menu(CliOptions *opts);
+void free_cli_options(CliOptions *opts);
 
 #endif // CLI_H

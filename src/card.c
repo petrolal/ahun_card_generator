@@ -2,13 +2,20 @@
 #include <stdio.h>
 #include <MagickWand/MagickWand.h>
 
+void init_card_engine(void) {
+    MagickWandGenesis();
+}
+
+void cleanup_card_engine(void) {
+    MagickWandTerminus();
+}
+
 int generate_card(CardConfig *config) {
     MagickWand *wand;
     DrawingWand *d_wand;
     PixelWand *p_wand;
     MagickBooleanType status;
 
-    MagickWandGenesis();
     wand = NewMagickWand();
 
     // 1. Load background
@@ -16,7 +23,6 @@ int generate_card(CardConfig *config) {
     if (status == MagickFalse) {
         fprintf(stderr, "Error: Could not read template image '%s'\n", config->template_path);
         wand = DestroyMagickWand(wand);
-        MagickWandTerminus();
         return -1;
     }
 
@@ -33,6 +39,9 @@ int generate_card(CardConfig *config) {
 
     // 3. Draw text elements
     for (int i = 0; i < config->element_count; i++) {
+        if (config->elements[i].text == NULL) {
+            continue;
+        }
         DrawSetFontSize(d_wand, config->elements[i].font_size);
         MagickAnnotateImage(wand, d_wand, config->elements[i].x, config->elements[i].y, 0, (const char*)config->elements[i].text);
     }
@@ -47,7 +56,6 @@ int generate_card(CardConfig *config) {
     d_wand = DestroyDrawingWand(d_wand);
     p_wand = DestroyPixelWand(p_wand);
     wand = DestroyMagickWand(wand);
-    MagickWandTerminus();
 
     return (status == MagickTrue) ? 0 : -1;
 }

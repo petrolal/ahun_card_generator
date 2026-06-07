@@ -41,8 +41,11 @@ Template* load_template(const char *xml_path) {
         if (cur->type == XML_ELEMENT_NODE) {
             if (strcmp((const char*)cur->name, "background") == 0) {
                 xmlChar *bg = xmlNodeGetContent(cur);
-                strncpy(tmpl->background_path, (const char*)bg, sizeof(tmpl->background_path) - 1);
-                xmlFree(bg);
+                if (bg) {
+                    memset(tmpl->background_path, 0, sizeof(tmpl->background_path));
+                    strncpy(tmpl->background_path, (const char*)bg, sizeof(tmpl->background_path) - 1);
+                    xmlFree(bg);
+                }
             } else if (strcmp((const char*)cur->name, "text_layer") == 0) {
                 for (layer_cur = cur->children; layer_cur; layer_cur = layer_cur->next) {
                     if (layer_cur->type == XML_ELEMENT_NODE) {
