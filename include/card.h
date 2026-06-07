@@ -2,6 +2,7 @@
 #define CARD_H
 
 typedef struct {
+  char id[64];
   const char *text;
   double x;
   double y;

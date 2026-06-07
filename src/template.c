@@ -50,7 +50,9 @@ Template* load_template(const char *xml_path) {
                 for (layer_cur = cur->children; layer_cur; layer_cur = layer_cur->next) {
                     if (layer_cur->type == XML_ELEMENT_NODE) {
                         xmlChar *content = xmlNodeGetContent(layer_cur);
-                        if (strcmp((const char*)layer_cur->name, "x") == 0) {
+                        if (strcmp((const char*)layer_cur->name, "id") == 0) {
+                            strncpy(tmpl->elements[idx].id, (const char*)content, sizeof(tmpl->elements[idx].id) - 1);
+                        } else if (strcmp((const char*)layer_cur->name, "x") == 0) {
                             tmpl->elements[idx].x = atof((const char*)content);
                         } else if (strcmp((const char*)layer_cur->name, "y") == 0) {
                             tmpl->elements[idx].y = atof((const char*)content);

@@ -141,7 +141,32 @@ int main(int argc, char *argv[]) {
     config.font_path = NULL;
 
     if (config.element_count > 0) {
-        config.elements[0].text = opts.text;
+        // Simple mapping for now: 
+        // If user provided text via -x, apply it to ALL layers that don't have text yet
+        // OR specific mapping if we implement key=value in CLI.
+        // For now, let's make it smarter: if text contains '=', treat as key=value pairs
+        if (strchr(opts.text, '=')) {
+            char *text_copy = strdup(opts.text);
+            char *pair = strtok(text_copy, ";");
+            while (pair) {
+                char *key = pair;
+                char *val = strchr(pair, '=');
+                if (val) {
+                    *val = '\0';
+                    val++;
+                    for (int i = 0; i < config.element_count; i++) {
+                        if (strcmp(config.elements[i].id, key) == 0) {
+                            config.elements[i].text = strdup(val); // Note: simple leak for now, but works
+                        }
+                    }
+                }
+                pair = strtok(NULL, ";");
+            }
+            free(text_copy);
+        } else {
+            // Backward compatibility: first layer gets the text
+            config.elements[0].text = opts.text;
+        }
     }
 
     ensure_directory_exists(opts.output_path);
