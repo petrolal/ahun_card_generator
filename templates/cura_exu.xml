@@ -1,0 +1,10 @@
+<template>
+    <background>images/cura_exu.png</background>
+    <text_layer>
+        <id>main_text</id>
+        <x>100</x>
+        <y>800</y>
+        <font_size>60</font_size>
+        <color>#000000</color>
+    </text_layer>
+</template>
