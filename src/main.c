@@ -1,6 +1,7 @@
 #include "cli.h"
 #include "template.h"
 #include "card.h"
+#include "parse_calendar.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +26,28 @@ int main(int argc, char *argv[]) {
 
     if (opts.interactive) {
         interactive_menu(&opts);
+    }
+
+    if (opts.generate_calendar) {
+        const char *input_path = opts.generate_calendar;
+        const char *output_path = opts.output_path;
+        
+        // If output is default and we are generating a calendar, change it to .json
+        if (strcmp(output_path, "output.png") == 0) {
+            output_path = "calendar.json";
+        }
+        
+        printf("\nGenerating calendar...\n");
+        printf("  Input:  %s\n", input_path);
+        printf("  Output: %s\n", output_path);
+
+        if (convert_calendar_to_json(input_path, output_path) == 0) {
+            printf("\x1b[32m" "Success! Calendar generated at: %s" "\x1b[0m" "\n", output_path);
+            return 0;
+        } else {
+            fprintf(stderr, "Failed to generate calendar.\n");
+            return 1;
+        }
     }
 
     if (opts.template_path == NULL) {

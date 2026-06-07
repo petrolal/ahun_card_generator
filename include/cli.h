@@ -4,13 +4,14 @@
 #include <stdbool.h>
 
 typedef struct {
-    char *template_path;
-    char *output_path;
-    char *text;
-    bool list_templates;
-    bool interactive;
-    bool show_help;
-    int error;
+  char *template_path;
+  char *output_path;
+  char *text;
+  bool list_templates;
+  char *generate_calendar;
+  bool interactive;
+  bool show_help;
+  int error;
 } CliOptions;
 
 CliOptions parse_arguments(int argc, char *argv[]);
