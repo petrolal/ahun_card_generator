@@ -1,114 +1,83 @@
 {
-	"calendar":	[{
-			"month":	"🔸 Abril",
-			"theme":	"Caboclos e Boiadeiros + Cura",
-			"giras":	[{
-					"type":	"Gira de desenvolvimento",
-					"date":	"11/04/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"23/04/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"25/04/2026"
-				}]
-		}, {
-			"month":	"🔸 Maio",
-			"theme":	"Pretos Velhos",
-			"giras":	[{
-					"type":	"Gira de desenvolvimento",
-					"date":	"16/05/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"28/05/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"30/05/2026"
-				}]
-		}, {
-			"month":	"🔸 Junho",
-			"theme":	"Festa de Exu Tiriri",
-			"giras":	[{
-					"type":	"Gira fechada",
-					"date":	"11/06/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"13/06/2026"
-				}]
-		}, {
-			"month":	"🔸 Julho",
-			"theme":	"Recesso (sem giras)",
-			"giras":	[{
-					"type":	"Gira fechada",
-					"date":	"23/07/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"25/07/2026"
-				}]
-		}, {
-			"month":	"🔸 Agosto",
-			"theme":	"Tema em aberto",
-			"giras":	[{
-					"type":	"Gira de desenvolvimento",
-					"date":	"15/08/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"27/08/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"29/08/2026"
-				}]
-		}, {
-			"month":	"🔸 Setembro",
-			"theme":	"Festa de Sete Saias",
-			"giras":	[{
-					"type":	"Gira de desenvolvimento",
-					"date":	"12/09/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"24/09/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"26/09/2026"
-				}]
-		}, {
-			"month":	"🔸 Outubro",
-			"theme":	"Erês e Pretos Velhos + Cura",
-			"giras":	[{
-					"type":	"Gira de desenvolvimento",
-					"date":	"17/10/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"29/10/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"31/10/2026"
-				}]
-		}, {
-			"month":	"🔸 Novembro",
-			"theme":	"Caboclos e Boiadeiros + Cura",
-			"giras":	[{
-					"type":	"Gira de desenvolvimento",
-					"date":	"14/11/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"26/11/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"28/11/2026"
-				}]
-		}, {
-			"month":	"🔸 Dezembro",
-			"theme":	"Encerramento – Exu e Pombojira",
-			"giras":	[{
-					"type":	"Gira de desenvolvimento",
-					"date":	"12/12/2026"
-				}, {
-					"type":	"Gira fechada",
-					"date":	"17/12/2026"
-				}, {
-					"type":	"Gira aberta",
-					"date":	"19/12/2026"
-				}]
-		}]
+  "calendar": [
+    {
+      "month": "🔸 Abril",
+      "theme": "Caboclos e Boiadeiros + Cura",
+      "giras": [
+        { "type": "Gira de desenvolvimento", "date": "11/04/2026" },
+        { "type": "Gira fechada", "date": "23/04/2026" },
+        { "type": "Gira aberta", "date": "25/04/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Maio",
+      "theme": "Pretos Velhos",
+      "giras": [
+        { "type": "Gira de desenvolvimento", "date": "16/05/2026" },
+        { "type": "Gira fechada", "date": "28/05/2026" },
+        { "type": "Gira aberta", "date": "30/05/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Junho",
+      "theme": "Festa de Exu Tiriri",
+      "giras": [
+        { "type": "Gira fechada", "date": "11/06/2026" },
+        { "type": "Gira aberta", "date": "13/06/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Julho",
+      "theme": "Recesso (sem giras)",
+      "giras": [
+        { "type": "Gira fechada", "date": "23/07/2026" },
+        { "type": "Gira fechada", "date": "25/07/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Agosto",
+      "theme": "Tema em aberto",
+      "giras": [
+        { "type": "Gira de desenvolvimento", "date": "15/08/2026" },
+        { "type": "Gira fechada", "date": "27/08/2026" },
+        { "type": "Gira aberta", "date": "29/08/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Setembro",
+      "theme": "Festa de Sete Saias",
+      "giras": [
+        { "type": "Gira de desenvolvimento", "date": "12/09/2026" },
+        { "type": "Gira fechada", "date": "24/09/2026" },
+        { "type": "Gira aberta", "date": "26/09/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Outubro",
+      "theme": "Erês e Pretos Velhos + Cura",
+      "giras": [
+        { "type": "Gira de desenvolvimento", "date": "17/10/2026" },
+        { "type": "Gira fechada", "date": "29/10/2026" },
+        { "type": "Gira aberta", "date": "31/10/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Novembro",
+      "theme": "Caboclos e Boiadeiros + Cura",
+      "giras": [
+        { "type": "Gira de desenvolvimento", "date": "14/11/2026" },
+        { "type": "Gira fechada", "date": "26/11/2026" },
+        { "type": "Gira aberta", "date": "28/11/2026" }
+      ]
+    },
+    {
+      "month": "🔸 Dezembro",
+      "theme": "Encerramento – Exu e Pombojira",
+      "giras": [
+        { "type": "Gira de desenvolvimento", "date": "12/12/2026" },
+        { "type": "Gira fechada", "date": "17/12/2026" },
+        { "type": "Gira aberta", "date": "19/12/2026" }
+      ]
+    }
+  ]
 }
