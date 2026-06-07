@@ -1,8 +1,8 @@
 #include "parse_calendar.h"
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 static char *trim_whitespace(char *str) {
   char *end;
@@ -49,21 +49,24 @@ int convert_calendar_to_json(const char *input_path, const char *output_path) {
       continue;
 
     char *colon = strchr(trimmed, ':');
-    
-    // Check if it's a new month (starts with emoji OR is a line without colon after giras have started)
-    if (strstr(trimmed, "🔸") || (!colon && (!month_started || giras_started))) {
+
+    // Check if it's a new month (starts with emoji OR is a line without colon
+    // after giras have started)
+    if (strstr(trimmed, "🔸") ||
+        (!colon && (!month_started || giras_started))) {
       if (month_started) {
         if (giras_started) {
           fprintf(out, "\n      ]\n");
         }
         fprintf(out, "    },\n");
       }
-      fprintf(out, "    {\n      \"mes\": \"%s\"", trimmed);
+      fprintf(out, "    {\n      \"month\": \"%s\"", trimmed);
       month_started = 1;
       giras_started = 0;
     } else if (!colon) {
-      // It's a theme line (no colon and we are already inside a month but haven't started giras)
-      fprintf(out, ",\n      \"tema\": \"%s\"", trimmed);
+      // It's a theme line (no colon and we are already inside a month but
+      // haven't started giras)
+      fprintf(out, ",\n      \"theme\": \"%s\"", trimmed);
     } else {
       // It's a gira (type: date)
       if (!giras_started) {
@@ -72,12 +75,13 @@ int convert_calendar_to_json(const char *input_path, const char *output_path) {
       } else {
         fprintf(out, ",");
       }
-      
+
       *colon = '\0';
       char *type = trim_whitespace(trimmed);
       char *date = trim_whitespace(colon + 1);
 
-      fprintf(out, "\n        { \"tipo\": \"%s\", \"data\": \"%s\" }", type, date);
+      fprintf(out, "\n        { \"type\": \"%s\", \"date\": \"%s\" }", type,
+              date);
     }
   }
 
