@@ -1,0 +1,17 @@
+<template>
+    <background>fundo.jpg</background>
+    <text_layer>
+        <id>nome_participante</id>
+        <x>150</x>
+        <y>450</y>
+        <font_size>45</font_size>
+        <color>#5D4037</color>
+    </text_layer>
+    <text_layer>
+        <id>data_sessao</id>
+        <x>150</x>
+        <y>520</y>
+        <font_size>30</font_size>
+        <color>#5D4037</color>
+    </text_layer>
+</template>
