@@ -4,7 +4,7 @@
 #ifdef ARDUINO
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
-#include <SD.h>
+#include <LittleFS.h>
 
 class LGFX_App : public lgfx::LGFX_Device {
 public:
@@ -36,7 +36,11 @@ uint32_t CardGenerator::get_color_from_string(const std::string& color) {
 }
 
 static bool save_sprite_to_bmp(LGFX_Sprite& sprite, const char* path) {
-    File file = SD.open(path, FILE_WRITE);
+    std::string local_path = path;
+    if (!local_path.empty() && local_path[0] != '/') {
+        local_path = "/" + local_path;
+    }
+    File file = LittleFS.open(local_path.c_str(), FILE_WRITE);
     if (!file) return false;
 
     uint32_t width = sprite.width();
@@ -85,9 +89,12 @@ Status CardGenerator::generate(const CardConfig& config) {
     Logger::info("Gerando card via LovyanGFX...");
 
     std::string path = config.template_path.data();
+    if (!path.empty() && path[0] != '/') {
+        path = "/" + path;
+    }
     uint32_t width = 800, height = 1200;
     
-    File file = SD.open(path.c_str());
+    File file = LittleFS.open(path.c_str());
     if (file) {
         if (path.find(".bmp") != std::string::npos) {
             file.seek(18);
@@ -128,7 +135,7 @@ Status CardGenerator::generate(const CardConfig& config) {
     if (save_sprite_to_bmp(canvas, config.output_path.data())) {
         Logger::success("Card gerado: " + std::string(config.output_path.data()));
     } else {
-        Logger::error("Erro ao gravar arquivo no SD.");
+        Logger::error("Erro ao gravar arquivo no LittleFS.");
     }
 
     canvas.deleteSprite();

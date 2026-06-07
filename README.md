@@ -5,8 +5,7 @@ Este projeto é um gerador de cards e cartazes automatizado para ESP32, capaz de
 ## 🛠️ Requisitos de Hardware
 
 *   **Microcontrolador:** ESP32-WROVER (Obrigatório possuir **PSRAM**).
-*   **Armazenamento:** Módulo de Cartão MicroSD (Conectado via SPI).
-*   **Cartão SD:** Formatado em FAT32.
+*   **Armazenamento:** Memória Flash Interna (Mínimo de 4MB de Flash, particionada via `partitions.csv`).
 
 ## 💻 Setup do Ambiente (Neovim + CLI)
 
@@ -20,20 +19,29 @@ Este projeto é um gerador de cards e cartazes automatizado para ESP32, capaz de
     pio run -t compiledb
     ```
 
-## 💾 Preparação do Cartão SD
+## 💾 Preparação da Memória Flash Interna (LittleFS)
 
-Antes de ligar o ESP32, você deve copiar o conteúdo da pasta `data/` para a raiz do seu Cartão MicroSD. A estrutura deve ficar assim:
+O projeto foi configurado para usar a memória Flash interna do ESP32 via **LittleFS** (eliminando a necessidade de um cartão SD físico). As imagens na pasta `data/images` foram otimizadas e comprimidas para caber no limite físico da partição da Flash (2.4 MB).
 
+Para gravar os arquivos de templates e imagens no ESP32:
+
+1. Conecte o ESP32 ao computador via USB.
+2. Execute o comando do PlatformIO para enviar o sistema de arquivos:
+   ```bash
+   pio run -e esp-wrover-kit -t uploadfs
+   ```
+
+A estrutura interna dos arquivos gravados será:
 ```text
-SD_ROOT/
+/
 ├── images/
 │   ├── cura_exu.png
 │   ├── festa_tiriri.png
-│   └── ... (todas as imagens)
+│   └── ...
 └── templates/
     ├── cura_exu.json
     ├── festa_tiriri.json
-    └── ... (todos os arquivos .json)
+    └── ...
 ```
 
 ## 🚀 Passo a Passo: Flashing via USB
@@ -72,10 +80,10 @@ pio device monitor -b 115200 --filter colorize
 
 Ao abrir o monitor serial, você verá o prompt. Digite `help` para ver os comandos:
 
-*   `list`: Lista todos os templates disponíveis no Cartão SD.
+*   `list`: Lista todos os templates disponíveis no LittleFS.
 *   `gen <template.json> <texto>`: Gera um card baseado no template e texto fornecidos.
     *   *Exemplo:* `gen cura_exu.json cura=Gira de Pretos Velhos;data=13 de Maio`
-*   `calendar <input.txt> <output.json>`: Converte um arquivo de texto de calendário para JSON no SD.
+*   `calendar <input.txt> <output.json>`: Converte um arquivo de texto de calendário para JSON no LittleFS.
 
 ## 🧪 Testes Nativos (Sem Hardware)
 

@@ -10,7 +10,7 @@
 
 #ifdef ARDUINO
 #include <FS.h>
-#include <SD.h>
+#include <LittleFS.h>
 #endif
 
 namespace ahun {
@@ -31,9 +31,13 @@ static std::string trim(const std::string& s) {
 Status CalendarParser::convert_to_json(const std::string& input_path, const std::string& output_path) {
     std::string content;
 #ifdef ARDUINO
-    File in_file = SD.open(input_path.c_str());
+    std::string local_input = input_path;
+    if (!local_input.empty() && local_input[0] != '/') {
+        local_input = "/" + local_input;
+    }
+    File in_file = LittleFS.open(local_input.c_str());
     if (!in_file) {
-        Logger::error("Error opening input file on SD: " + input_path);
+        Logger::error("Error opening input file on LittleFS: " + local_input);
         return Status::ERROR_FILE_NOT_FOUND;
     }
     while (in_file.available()) {
@@ -103,13 +107,17 @@ Status CalendarParser::convert_to_json(const std::string& input_path, const std:
     char* json_string = cJSON_Print(root.get());
     if (json_string) {
 #ifdef ARDUINO
-        File out_file = SD.open(output_path.c_str(), FILE_WRITE);
+        std::string local_output = output_path;
+        if (!local_output.empty() && local_output[0] != '/') {
+            local_output = "/" + local_output;
+        }
+        File out_file = LittleFS.open(local_output.c_str(), FILE_WRITE);
         if (out_file) {
             out_file.print(json_string);
             out_file.close();
         } else {
             free(json_string);
-            Logger::error("Error opening output file on SD: " + output_path);
+            Logger::error("Error opening output file on LittleFS: " + local_output);
             return Status::ERROR_GENERAL;
         }
 #else

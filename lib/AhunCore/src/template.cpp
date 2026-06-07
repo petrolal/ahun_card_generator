@@ -8,7 +8,7 @@
 
 #ifdef ARDUINO
 #include <FS.h>
-#include <SD.h>
+#include <LittleFS.h>
 #else
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -18,12 +18,16 @@ namespace ahun {
 
 void CardTemplate::list_available(const std::string& dir_path) {
 #ifdef ARDUINO
-    File root = SD.open(dir_path.c_str());
+    std::string local_dir = dir_path;
+    if (!local_dir.empty() && local_dir[0] != '/') {
+        local_dir = "/" + local_dir;
+    }
+    File root = LittleFS.open(local_dir.c_str());
     if (!root || !root.isDirectory()) {
-        Logger::error("Templates directory does not exist on SD: " + dir_path);
+        Logger::error("Templates directory does not exist on LittleFS: " + local_dir);
         return;
     }
-    Logger::info("Available Templates (SD):");
+    Logger::info("Available Templates (LittleFS):");
     File file = root.openNextFile();
     while (file) {
         std::string fileName = file.name();
@@ -58,7 +62,11 @@ void CardTemplate::list_available(const std::string& dir_path) {
 Status CardTemplate::load(const std::string& json_path, CardTemplate& tmpl) {
     std::string content;
 #ifdef ARDUINO
-    File file = SD.open(json_path.c_str());
+    std::string local_json = json_path;
+    if (!local_json.empty() && local_json[0] != '/') {
+        local_json = "/" + local_json;
+    }
+    File file = LittleFS.open(local_json.c_str());
     if (!file) {
         Logger::error("Could not open template file: " + json_path);
         return Status::ERROR_FILE_NOT_FOUND;

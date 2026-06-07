@@ -13,7 +13,7 @@
 #ifdef ARDUINO
 #include <Arduino.h>
 #include <FS.h>
-#include <SD.h>
+#include <LittleFS.h>
 #endif
 
 using namespace ahun;
@@ -24,11 +24,11 @@ void setup() {
     delay(1000);
     Logger::info("Ahun Card Generator - Embedded Start");
 
-    if (!SD.begin()) {
-        Logger::error("SD Card Mount Failed!");
+    if (!LittleFS.begin(true)) {
+        Logger::error("LittleFS Mount Failed!");
         return;
     }
-    Logger::success("SD Card Mounted.");
+    Logger::success("LittleFS Mounted.");
 
     // Simple test logic for embedded
     CardTemplate tmpl;
