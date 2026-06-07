@@ -6,6 +6,51 @@
 #include <stdlib.h>
 #include <string.h>
 #include <libxml/parser.h>
+#include <sys/stat.h>
+#include <errno.h>
+
+static void ensure_directory_exists(const char *path) {
+    char tmp[1024];
+    char *p = NULL;
+    size_t len;
+
+    snprintf(tmp, sizeof(tmp), "%s", path);
+    len = strlen(tmp);
+    if (len == 0) return;
+    
+    // If it's just a filename in the current directory, nothing to do
+    p = strrchr(tmp, '/');
+    if (p == NULL) return;
+    
+    *p = '\0'; // tmp now contains the directory path
+
+    char subpath[1024];
+    memset(subpath, 0, sizeof(subpath));
+    
+    // Simple recursive mkdir
+    char *start = tmp;
+    if (*start == '/') {
+        // Handle absolute paths
+        subpath[0] = '/';
+        subpath[1] = '\0';
+        start++;
+    }
+
+    char *token = strtok(start, "/");
+    while (token != NULL) {
+        if (subpath[0] != '\0' && subpath[strlen(subpath)-1] != '/') {
+            strcat(subpath, "/");
+        }
+        strcat(subpath, token);
+        
+        if (mkdir(subpath, 0755) == -1) {
+            if (errno != EEXIST) {
+                fprintf(stderr, "Warning: Could not create directory %s: %s\n", subpath, strerror(errno));
+            }
+        }
+        token = strtok(NULL, "/");
+    }
+}
 
 int main(int argc, char *argv[]) {
     CliOptions opts = parse_arguments(argc, argv);
@@ -40,6 +85,7 @@ int main(int argc, char *argv[]) {
         const char *input_path = opts.generate_calendar;
         const char *output_path = opts.output_path;
         
+        ensure_directory_exists(output_path);
         printf("\nGenerating calendar...\n");
         printf("  Input:  %s\n", input_path);
         printf("  Output: %s\n", output_path);
@@ -98,6 +144,7 @@ int main(int argc, char *argv[]) {
         config.elements[0].text = opts.text;
     }
 
+    ensure_directory_exists(opts.output_path);
     printf("\nGenerating card...\n");
     if (generate_card(&config) != 0) {
         fprintf(stderr, "Failed to generate card.\n");
