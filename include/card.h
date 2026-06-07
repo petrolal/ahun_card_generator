@@ -6,6 +6,8 @@ typedef struct {
   double x;
   double y;
   double font_size;
+  char color[32];
+  char font_path[256];
 } TextElement;
 
 typedef struct {

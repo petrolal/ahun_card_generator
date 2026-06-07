@@ -42,6 +42,22 @@ int generate_card(CardConfig *config) {
         if (config->elements[i].text == NULL) {
             continue;
         }
+
+        // Set color for this element
+        if (config->elements[i].color[0] != '\0') {
+            PixelSetColor(p_wand, config->elements[i].color);
+        } else {
+            PixelSetColor(p_wand, "black"); // Default
+        }
+        DrawSetFillColor(d_wand, p_wand);
+
+        // Set font for this element
+        if (config->elements[i].font_path[0] != '\0') {
+            DrawSetFont(d_wand, config->elements[i].font_path);
+        } else if (config->font_path) {
+            DrawSetFont(d_wand, config->font_path);
+        }
+
         DrawSetFontSize(d_wand, config->elements[i].font_size);
         MagickAnnotateImage(wand, d_wand, config->elements[i].x, config->elements[i].y, 0, (const char*)config->elements[i].text);
     }

@@ -56,6 +56,10 @@ Template* load_template(const char *xml_path) {
                             tmpl->elements[idx].y = atof((const char*)content);
                         } else if (strcmp((const char*)layer_cur->name, "font_size") == 0) {
                             tmpl->elements[idx].font_size = atof((const char*)content);
+                        } else if (strcmp((const char*)layer_cur->name, "color") == 0) {
+                            strncpy(tmpl->elements[idx].color, (const char*)content, sizeof(tmpl->elements[idx].color) - 1);
+                        } else if (strcmp((const char*)layer_cur->name, "font") == 0) {
+                            strncpy(tmpl->elements[idx].font_path, (const char*)content, sizeof(tmpl->elements[idx].font_path) - 1);
                         }
                         xmlFree(content);
                     }
