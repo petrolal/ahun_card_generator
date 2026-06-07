@@ -1,0 +1,7 @@
+{
+    "background": "images/ere_pretos_velhos.png",
+    "text_layers": [
+        {"id": "gira", "x": 100, "y": 800, "font_size": 70, "color": "white"},
+        {"id": "data", "x": 100, "y": 900, "font_size": 45, "color": "yellow"}
+    ]
+}

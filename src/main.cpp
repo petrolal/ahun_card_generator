@@ -2,127 +2,122 @@
 #include "template.hpp"
 #include "card.hpp"
 #include "parse_calendar.hpp"
-#include "exceptions.hpp"
 #include "logger.hpp"
-#include "wrappers/MagickWandWrapper.hpp"
-#include "wrappers/XmlWrapper.hpp"
 #include <iostream>
 #include <string>
 #include <vector>
-#include <filesystem>
 #include <sstream>
 #include <memory>
+#include <cstring>
+
+#ifdef ARDUINO
+#include <Arduino.h>
+#include <FS.h>
+#include <SD.h>
+#endif
 
 using namespace ahun;
-namespace fs = std::filesystem;
 
-static void ensure_directory_exists(const std::string& path) {
-    if (path.empty()) return;
-    fs::path p(path);
-    if (p.has_parent_path()) {
-        if (fs::create_directories(p.parent_path())) {
-            Logger::info("Created directory: " + p.parent_path().string());
-        }
+#ifdef ARDUINO
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+    Logger::info("Ahun Card Generator - Embedded Start");
+
+    if (!SD.begin()) {
+        Logger::error("SD Card Mount Failed!");
+        return;
+    }
+    Logger::success("SD Card Mounted.");
+
+    // Simple test logic for embedded
+    CardTemplate tmpl;
+    if (CardTemplate::load("/templates/template1.json", tmpl) == Status::OK) {
+        Logger::success("Template loaded successfully on ESP32.");
     }
 }
 
+void loop() {
+    CliParser::process_serial_command();
+    delay(10); // Pequeno delay para estabilidade
+}
+
+#else
+// Native Main for Double Targeting
 int main(int argc, char *argv[]) {
-    try {
-        // Global Initializations (RAII)
-        MagickEngine magick_engine;
-        XmlEngine xml_engine;
+    AppConfig opts = CliParser::parse_arguments(argc, argv);
 
-        AppConfig opts = CliParser::parse_arguments(argc, argv);
+    if (opts.error) {
+        CliParser::show_help(argv[0]);
+        return 1;
+    }
 
-        if (opts.error) {
-            CliParser::show_help(argv[0]);
-            return 1;
-        }
+    if (opts.show_help) {
+        CliParser::show_help(argv[0]);
+        return 0;
+    }
 
-        if (opts.show_help) {
-            CliParser::show_help(argv[0]);
+    if (opts.list_templates) {
+        CardTemplate::list_available("./templates");
+        return 0;
+    }
+
+    if (opts.interactive) {
+        CliParser::interactive_menu(opts);
+    }
+
+    if (!opts.generate_calendar.empty()) {
+        Logger::info("Generating calendar (Native)...");
+        if (CalendarParser::convert_to_json(opts.generate_calendar, opts.output_path) == Status::OK) {
+            Logger::success("Calendar generated.");
             return 0;
         }
+        return 1;
+    }
 
-        if (opts.list_templates) {
-            CardTemplate::list_available("./templates");
-            return 0;
-        }
+    if (opts.template_path.empty() || opts.text.empty()) {
+        Logger::error("Template path and text are required.");
+        return 1;
+    }
 
-        if (opts.interactive) {
-            CliParser::interactive_menu(opts);
-        }
+    CardTemplate tmpl;
+    if (CardTemplate::load(opts.template_path, tmpl) != Status::OK) {
+        return 1;
+    }
 
-        if (!opts.generate_calendar.empty()) {
-            ensure_directory_exists(opts.output_path);
-            Logger::info("Generating calendar...");
-            Logger::info("  Input:  " + opts.generate_calendar);
-            Logger::info("  Output: " + opts.output_path);
+    CardConfig config;
+    std::strncpy(config.template_path.data(), tmpl.background_path.data(), config.template_path.size() - 1);
+    std::strncpy(config.output_path.data(), opts.output_path.c_str(), config.output_path.size() - 1);
+    config.elements = tmpl.elements;
 
-            CalendarParser::convert_to_json(opts.generate_calendar, opts.output_path);
-            Logger::success("Calendar generated at: " + opts.output_path);
-            return 0;
-        }
-
-        if (opts.template_path.empty()) {
-            throw ConfigException("Template path is required. Use -t or -i.");
-        }
-
-        if (opts.text.empty()) {
-            throw ConfigException("Text is required. Use -x or -i.");
-        }
-
-        std::unique_ptr<CardTemplate> tmpl(CardTemplate::load(opts.template_path));
-        
-        Logger::info("Configuration Loaded:");
-        Logger::info("  Template: " + opts.template_path);
-        Logger::info("  Background: " + tmpl->background_path);
-        Logger::info("  Text: " + opts.text);
-        Logger::info("  Output: " + opts.output_path);
-
-        CardConfig config;
-        if (!tmpl->background_path.empty() && tmpl->background_path[0] != '/' && tmpl->background_path[0] != '.') {
-            config.template_path = "templates/" + tmpl->background_path;
-        } else {
-            config.template_path = tmpl->background_path;
-        }
-        
-        config.output_path = opts.output_path;
-        config.elements = tmpl->elements;
-
-        if (!config.elements.empty()) {
-            if (opts.text.find('=') != std::string::npos) {
-                std::stringstream ss(opts.text);
-                std::string pair;
-                while (std::getline(ss, pair, ';')) {
-                    size_t sep = pair.find('=');
-                    if (sep != std::string::npos) {
-                        std::string key = pair.substr(0, sep);
-                        std::string val = pair.substr(sep + 1);
-                        for (auto& el : config.elements) {
-                            if (el.id == key) {
-                                el.text = val;
-                            }
+    // Mapping text logic
+    if (!config.elements.empty()) {
+        if (opts.text.find('=') != std::string::npos) {
+            std::stringstream ss(opts.text);
+            std::string pair;
+            while (std::getline(ss, pair, ';')) {
+                size_t sep = pair.find('=');
+                if (sep != std::string::npos) {
+                    std::string key = pair.substr(0, sep);
+                    std::string val = pair.substr(sep + 1);
+                    for (auto& el : config.elements) {
+                        if (std::string(el.id.data()) == key) {
+                            std::strncpy(el.text.data(), val.c_str(), el.text.size() - 1);
                         }
                     }
                 }
-            } else {
-                config.elements[0].text = opts.text;
             }
+        } else {
+            std::strncpy(config.elements[0].text.data(), opts.text.c_str(), config.elements[0].text.size() - 1);
         }
-
-        ensure_directory_exists(opts.output_path);
-        Logger::info("Generating card...");
-        CardGenerator::generate(config);
-
-        Logger::success("Card generated at: " + opts.output_path);
-        return 0;
-
-    } catch (const AhunException& e) {
-        Logger::error(e.what());
-        return 1;
-    } catch (const std::exception& e) {
-        Logger::error(std::string("Unhandled exception: ") + e.what());
-        return 1;
     }
+
+    Logger::info("Generating card (Native)...");
+    if (CardGenerator::generate(config) == Status::OK) {
+        Logger::success("Card generated successfully.");
+        return 0;
+    }
+
+    return 1;
 }
+#endif

@@ -1,0 +1,26 @@
+{
+    "background": "images/cura_exu.png",
+    "text_layers": [
+        {
+            "id": "cura",
+            "x": 100,
+            "y": 750,
+            "font_size": 50,
+            "color": "white"
+        },
+        {
+            "id": "gira",
+            "x": 100,
+            "y": 830,
+            "font_size": 65,
+            "color": "white"
+        },
+        {
+            "id": "data",
+            "x": 100,
+            "y": 910,
+            "font_size": 45,
+            "color": "yellow"
+        }
+    ]
+}
