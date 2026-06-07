@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
-project(AhunCardGenerator C)
+project(AhunCardGenerator CXX)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  add_compile_options(-g -O0 -fsanitize=address -fno-omit-frame-pointer)
+  add_link_options(-fsanitize=address)
+endif()
+
 add_compile_options(-Wall -Wextra -Wno-unused-parameter)
 
 find_package(PkgConfig REQUIRED)
@@ -16,12 +23,11 @@ add_definitions(
 )
 
 set(SOURCES
-  src/main.c
-  src/card.c
-  src/cli.c
-  src/list_templates.c
-  src/parse_calendar.c
-  src/template.c
+  src/main.cpp
+  src/card.cpp
+  src/cli.cpp
+  src/parse_calendar.cpp
+  src/template.cpp
 )
 
 add_executable(ahun_card_generator ${SOURCES})
